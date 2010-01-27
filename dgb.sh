@@ -17,6 +17,26 @@ BACKUP="/home/scor/drupal_sites/multi6"
 # unless you have a specific path for it).
 DRUPAL_ROOT="$BACKUP/drupal"
 
+# Path to the script, we cannot rely on pwd if the script is called with cron.
+SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+
+# Override default variables with custom configuration file, if it exists.
+if [ -f "$SELF_PATH/dgb.config.sh" ]; then
+  . "$SELF_PATH/dgb.config.sh"
+fi
+
+status() {
+  if [ -f "$SELF_PATH/dgb.config.sh" ]; then
+    echo "Config file:      $SELF_PATH/dgb.config.sh"
+  else
+    echo "Config file: none"
+  fi
+  echo "Drush location:   $DRUSH"
+  echo "Backup path:      $BACKUP"
+  echo "Drupal code base: $DRUPAL_ROOT"
+
+}
+
 dump_databases() {
   # Creates a SQL dump of all the sites in the database directory.
   for site in $( ls "$DRUPAL_ROOT/sites" )
@@ -27,7 +47,7 @@ dump_databases() {
     if [ -d $site_path -a -f "$site_path/settings.php"  -a ! -L $site_path ]; then
       echo "Dumping database for $site..."
       cd "$site_path"
-      $DRUSH sql-dump --ordered-dump --structure-tables-key=common > "$BACKUP/database/$site.sql"
+      $DRUSH sql dump --ordered-dump --structure-tables-key=common > "$BACKUP/database/$site.sql"
       echo "Done"
     fi
   done
@@ -46,6 +66,10 @@ commit() {
 }
 
 case "${1:-''}" in
+  'status')
+    status
+    ;;
+
   'dump')
     dump_databases
     ;;
