@@ -66,7 +66,7 @@ commit() {
 }
 
 case "${1:-''}" in
-  'status')
+  'status'|'info')
     status
     ;;
 
@@ -79,7 +79,7 @@ case "${1:-''}" in
     ;;
 
   'help')
-    echo "Usage: $SELF dump|commit"
+    echo "Usage: status|dump|commit"
     ;;
 
   *)
