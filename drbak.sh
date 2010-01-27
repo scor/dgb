@@ -7,34 +7,62 @@
 #   - git <http://git-scm.com/>
 #   - lastest version of Drush <http://drupal.org/project/drush>
 
+# Absolute path to the drush executable.
 DRUSH="/home/scor/.drush/drush/drush"
 
 # Absolute path to the backup directory
 BACKUP="/home/scor/drupal_sites/multi6"
-# Absolute path to the root folder of the Drupal code base.
+
+# Absolute path to the root folder of the Drupal code base (leave it as it is
+# unless you have a specific path for it).
 DRUPAL_ROOT="$BACKUP/drupal"
 
-# Creates a SQL dump of all the sites in the database directory.
-for site in $( ls "$DRUPAL_ROOT/sites" )
-do
-  site_path="$DRUPAL_ROOT/sites/$site"
+dump_databases() {
+  # Creates a SQL dump of all the sites in the database directory.
+  for site in $( ls "$DRUPAL_ROOT/sites" )
+  do
+    site_path="$DRUPAL_ROOT/sites/$site"
 
-  # Selects directories which contain settings.php (excluding symbolic links)
-  if [ -d $site_path -a -f "$site_path/settings.php"  -a ! -L $site_path ]; then
-    echo "Dumping database for $site..."
-    cd "$site_path"
-    $DRUSH sql dump --ordered-dump --structure-tables-key=common > "$BACKUP/database/$site.sql"
-    echo "Done"
-  fi
-done
+    # Selects directories which contain settings.php (excluding symbolic links)
+    if [ -d $site_path -a -f "$site_path/settings.php"  -a ! -L $site_path ]; then
+      echo "Dumping database for $site..."
+      cd "$site_path"
+      $DRUSH sql-dump --ordered-dump --structure-tables-key=common > "$BACKUP/database/$site.sql"
+      echo "Done"
+    fi
+  done
+}
 
-# Ensures all the files (even the new ones) get added to the git repository
-# Warning: this assumes you have created a git repository in your backup
-# directory. Simply run `git init` in your backup directory to do so.
-cd $BACKUP
-git add database/
-git add drupal/
+commit() {
+  # Ensures all the files (even the new ones) get added to the git repository
+  # Warning: this assumes you have created a git repository in your backup
+  # directory. Simply run `git init` in your backup directory to do so.
+  cd $BACKUP
+  git add database/
+  git add drupal/
 
-# Commits every change
-git commit -am "auto-commit changes database and files"
+  # Commits every change
+  git commit -am "auto-commit changes database and files"
+}
+
+case "${1:-''}" in
+  'dump')
+    dump_databases
+    ;;
+
+  'commit')
+    commit
+    ;;
+
+  'help')
+    echo "Usage: $SELF dump|commit"
+    ;;
+
+  *)
+    # By default, if no option is given as input, the whole site and databases
+    # are committed.
+    dump_databases
+    commit
+    ;;
+esac
 
