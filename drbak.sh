@@ -4,14 +4,13 @@
 # Drupal sites folder as well as the Drupal code base and sites files.
 
 # Requirements
-#   - git http://git-scm.com/
-#   - lastest version of Drush
-#       http://ftp.drupal.org/files/projects/drush-All-Versions-HEAD.tar.gz
+#   - git <http://git-scm.com/>
+#   - lastest version of Drush <http://drupal.org/project/drush>
 
-DRUSH="/Users/scor/.drush/drush/drush"
+DRUSH="/home/scor/.drush/drush/drush"
 
 # Absolute path to the backup directory
-BACKUP="/Users/scor/drupal_sites/multi6"
+BACKUP="/home/scor/drupal_sites/multi6"
 # Absolute path to the root folder of the Drupal code base.
 DRUPAL_ROOT="$BACKUP/drupal"
 
