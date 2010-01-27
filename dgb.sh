@@ -47,7 +47,7 @@ dump_databases() {
     if [ -d $site_path -a -f "$site_path/settings.php"  -a ! -L $site_path ]; then
       echo "Dumping database for $site..."
       cd "$site_path"
-      $DRUSH sql dump --ordered-dump --structure-tables-key=common > "$BACKUP/database/$site.sql"
+      $DRUSH sql dump --allow-spaces-in-commands --ordered-dump --structure-tables-key=common > "$BACKUP/database/$site.sql"
       echo "Done"
     fi
   done
