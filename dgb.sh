@@ -7,26 +7,15 @@
 #   - git <http://git-scm.com/>
 #   - lastest version of Drush <http://drupal.org/project/drush>
 
-# Absolute path to the drush executable.
-DRUSH="/home/scor/.drush/drush/drush"
-
-# Absolute path to the backup directory
-BACKUP="/var/sites/drupal_sites/multi6"
-
-# Absolute path to the dgb script. Assumes it's one level up the backup
-# directory. Change otherwise.
-DGB="$BACKUP/.."
-
-# Absolute path to the root folder of the Drupal code base (leave it as it is
-# unless you have a specific path for it).
-DRUPAL_ROOT="$BACKUP/drupal"
-
 # Path to the script, we cannot rely on pwd if the script is called with cron.
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 # Override default variables with custom configuration file, if it exists.
 if [ -f "$SELF_PATH/dgb.config.sh" ]; then
   . "$SELF_PATH/dgb.config.sh"
+else
+  echo "The dgb configuration file is missing. Please rename dgb.config.example.sh to dgb.config.sh and configure it."
+  exit
 fi
 
 status() {
@@ -36,7 +25,7 @@ status() {
     echo "Config file:           none"
   fi
   echo "Drush location:        $DRUSH"
-  echo "dgbsql drush location: $DRUSH.dgbsql.drush.inc"
+  echo "dgbsql drush location: $DGB"
   echo "Backup path:           $BACKUP"
   echo "Drupal code base:      $DRUPAL_ROOT"
 
@@ -50,9 +39,9 @@ dump_databases() {
 
     # Selects directories which contain settings.php (excluding symbolic links)
     if [ -d $site_path -a -f "$site_path/settings.php"  -a ! -L $site_path ]; then
-      echo "Dumping database for $site..."
+      echo "Dumping database for site $site..."
       cd "$site_path"
-      $DRUSH dgbsql-dump --include="$BACKUP/.." --ordered-dump --structure-tables-key=common --dgbsql-log --result-file="$BACKUP/database/$site.sql"
+      $DRUSH dgbsql-dump --include="$DGB" --ordered-dump --structure-tables-key=common --dgbsql-log --result-file="$BACKUP/database/$site.sql"
       echo "Done"
     fi
   done
