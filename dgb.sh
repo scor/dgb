@@ -13,6 +13,10 @@ DRUSH="/home/scor/.drush/drush/drush"
 # Absolute path to the backup directory
 BACKUP="/var/sites/drupal_sites/multi6"
 
+# Absolute path to the dgb script. Assumes it's one level up the backup
+# directory. Change otherwise.
+DGB="$BACKUP/.."
+
 # Absolute path to the root folder of the Drupal code base (leave it as it is
 # unless you have a specific path for it).
 DRUPAL_ROOT="$BACKUP/drupal"
@@ -27,13 +31,14 @@ fi
 
 status() {
   if [ -f "$SELF_PATH/dgb.config.sh" ]; then
-    echo "Config file:      $SELF_PATH/dgb.config.sh"
+    echo "Config file:           $SELF_PATH/dgb.config.sh"
   else
-    echo "Config file: none"
+    echo "Config file:           none"
   fi
-  echo "Drush location:   $DRUSH"
-  echo "Backup path:      $BACKUP"
-  echo "Drupal code base: $DRUPAL_ROOT"
+  echo "Drush location:        $DRUSH"
+  echo "dgbsql drush location: $DRUSH.dgbsql.drush.inc"
+  echo "Backup path:           $BACKUP"
+  echo "Drupal code base:      $DRUPAL_ROOT"
 
 }
 
@@ -47,7 +52,7 @@ dump_databases() {
     if [ -d $site_path -a -f "$site_path/settings.php"  -a ! -L $site_path ]; then
       echo "Dumping database for $site..."
       cd "$site_path"
-      $DRUSH sql dump --allow-spaces-in-commands --ordered-dump --structure-tables-key=common > "$BACKUP/database/$site.sql"
+      $DRUSH dgbsql-dump --include="$BACKUP/.." --ordered-dump --structure-tables-key=common --dgbsql-log --result-file="$BACKUP/database/$site.sql"
       echo "Done"
     fi
   done
