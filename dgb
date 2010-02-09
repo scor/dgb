@@ -46,7 +46,7 @@ dump_databases() {
       cd "$site_path"
       # Call to drush with custom dgbsql script.
       # Using --dgbsql-log (for now) for degugging purposes.
-      $DRUSH dgbsql-dump --include="$DGB" $EXTRA --ordered-dump --structure-tables-key=common --result-file="$BACKUP/databases/$site.sql"
+      $DRUSH dgbsql-dump $EXTRA --ordered-dump --structure-tables-key=common --result-file="$BACKUP/databases/$site.sql"
       echo "Done"
     fi
   done
