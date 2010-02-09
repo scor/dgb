@@ -46,7 +46,7 @@ dump_databases() {
       cd "$site_path"
       # Call to drush with custom dgbsql script.
       # Using --dgbsql-log (for now) for degugging purposes.
-      $DRUSH dgbsql-dump --include="$DGB" --ordered-dump --structure-tables-key=common --dgbsql-log --result-file="$BACKUP/databases/$site.sql"
+      $DRUSH dgbsql-dump --include="$DGB" $EXTRA --ordered-dump --structure-tables-key=common --result-file="$BACKUP/databases/$site.sql"
       echo "Done"
     fi
   done
@@ -65,6 +65,15 @@ commit() {
   git commit -am "auto-commit changes for databases and files"
 }
 
+usage() {
+  echo
+  echo "Files space used:"
+  cd $BACKUP
+  du -hs .git/
+  du -hs drupal/
+  du -hs databases/
+}
+
 case "${1:-''}" in
   'status'|'info')
     status
@@ -78,13 +87,18 @@ case "${1:-''}" in
     commit
     ;;
 
+  'usage')
+    usage
+    ;;
+
   'backup')
     dump_databases
     commit
+    usage
     ;;
 
   'help'|*)
-    echo "Usage: status|dump|commit"
+    echo "Usage: status|dump|commit|usage|backup"
     ;;
 
 esac
