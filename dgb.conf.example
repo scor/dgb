@@ -16,3 +16,4 @@ DRUPAL_ROOT="$BACKUP/drupal"
 # Extra arguments to be passed to drush. For example --dgbsql-log will output
 # the query which was run, useful to know what tables were backed up.
 EXTRA="--dgbsql-log"
+
