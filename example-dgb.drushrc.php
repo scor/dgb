@@ -6,21 +6,6 @@
 // as part of whole site. If you already have drushrc.php file, you can just add
 // the settings below to it.
 
-// Default logging level for php notices.  Defaults to "notice"; set to "warning"
-// if doing drush development.  Also make sure that error_reporting is set to E_ALL
-// in your php configuration file.  See 'drush status' for the path to your php.ini file.
-$options['php-notices'] = 'warning';
-
-/*
- * Customize this associative array with your own tables. This is the list of
- * tables whose *data* is skipped by the 'sql-dump' and 'sql-sync' commands when
- * a structure-tables-key is provided. You may add new tables to the existing
- * array or add a new element.
- */
-//  $options['structure-tables'] = array(
-//     'common' => array('accesslog', 'cache', 'cache_*', 'history', 'search_dataset', 'search_index', 'search_total', 'sessions', 'watchdog'),
-//  );
-
 /*
  * Command-specific options for dgb.
  *
@@ -41,7 +26,7 @@ $dgb_options = array(
   // Necessary to have a better versionability of the sql dumps.
   'ordered-dump' => TRUE,
   // By default 'common' is a list of tables whose data will not be backed up.
-  // See above to change or add other keys can be added to
+  // See below to change or add other keys can be added to
   // $options['structure-tables'].
   'structure-tables-key' => 'common',
   // Useful to see what tables are effectively being backed up.
@@ -59,3 +44,18 @@ $command_specific['dgbsql-dump'] = $dgb_options;
 $command_specific['dgbsql-commit'] = $dgb_options;
 $command_specific['dgbsql-usage'] = $dgb_options;
 $command_specific['dgbsql-backup'] = $dgb_options;
+
+/*
+ * Customize this associative array with your own tables. This is the list of
+ * tables whose *data* is skipped by the 'sql-dump' and 'sql-sync' commands when
+ * a structure-tables-key is provided. You may add new tables to the existing
+ * array or add a new element.
+ */
+//  $options['structure-tables'] = array(
+//     'common' => array('accesslog', 'cache', 'cache_*', 'history', 'search_dataset', 'search_index', 'search_total', 'sessions', 'watchdog'),
+//  );
+
+// Default logging level for php notices.  Defaults to "notice"; set to "warning"
+// if doing drush development.  Also make sure that error_reporting is set to E_ALL
+// in your php configuration file.  See 'drush status' for the path to your php.ini file.
+#$options['php-notices'] = 'warning';
