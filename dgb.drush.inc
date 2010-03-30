@@ -127,7 +127,7 @@ function drush_dgb_dump() {
   // which are physically stored within the Drupal installation directory.
   foreach ($sites as $site) {
     if (is_link($site->filename)) {
-      drush_print($site->filename . " is a symbolic link and the database defined in settings.php will not be backed up.\n");
+      drush_print($site->filename . " is a symbolic link and the database defined in its settings.php will not be backed up.\n");
       continue;
     }
     // Ignore directories without a settings.php
