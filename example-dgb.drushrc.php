@@ -44,6 +44,7 @@ $dgb_options = array(
   // See above to change or add other keys can be added to
   // $options['structure-tables'].
   'structure-tables-key' => 'common',
+  // Useful to see what tables are effectively being backed up.
   'display-dump-command' => TRUE,
   // Path to the directory where the database dumps will be stored. Can be
   // relative to DRUPAL_ROOT or absolute. Make sure it is within the git
