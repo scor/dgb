@@ -2,7 +2,7 @@
 
 /**
  * @file
- *   dgbsql drush command.
+ *   dgb drush command.
  */
 
 /**
@@ -11,7 +11,7 @@
  * @return
  *   An associative array describing your command(s).
  */
-function dgbsql_drush_command() {
+function dgb_drush_command() {
   $options['--database'] = 'The DB connection key if using multiple connections in settings.php.';
   if (drush_drupal_major_version() >= 7) {
     $options['--target'] = 'The name of a target within the specified database.';
@@ -19,9 +19,9 @@ function dgbsql_drush_command() {
 
   $items = array();
 
-  $items['dgbsql-dump'] = array(
+  $items['dgb-dump'] = array(
     'description' => 'Dumps all the databases of a Drupal installation. Alternative to the core sql-dump command, with support for table name expansion and validation.',
-    'callback' => 'drush_dgbsql_dump',
+    'callback' => 'drush_dgb_dump',
     // We require to be located in a fully functionnal Drupal site for now
     // until we provide support/help for the case where the user is calling
     // dgb outside a Drupal site context.
@@ -35,25 +35,25 @@ function dgbsql_drush_command() {
     ) + $options,
   );
 
-  $items['dgbsql-commit'] = array(
+  $items['dgb-commit'] = array(
     'description' => 'Commits Drupal installation directory including the files directory of all sites, as well as the SQL dumps directory if they are located in the same master backup directory (typically one level up DRUPAL_ROOT).',
-    'callback' => 'drush_dgbsql_commit',
+    'callback' => 'drush_dgb_commit',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
     'options' => array(
     ) + $options,
   );
 
-  $items['dgbsql-usage'] = array(
+  $items['dgb-usage'] = array(
     'description' => 'Displays some information on the current size of the repository and the Drupal installation.',
-    'callback' => 'drush_dgbsql_usage',
+    'callback' => 'drush_dgb_usage',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
     'options' => array(
     ) + $options,
   );
 
-  $items['dgbsql-backup'] = array(
+  $items['dgb-backup'] = array(
     'description' => 'Wrapper command to dump, commit and display the size of the Drupal installation and repository',
-    'callback' => 'drush_dgbsql_backup',
+    'callback' => 'drush_dgb_backup',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
     'options' => array(
     ) + $options,
@@ -65,17 +65,17 @@ function dgbsql_drush_command() {
 /**
  * Command callback. Backup a Drupal installation.
  */
-function drush_dgbsql_backup() {
-  drush_dgbsql_dump();
-  drush_dgbsql_commit();
-  drush_dgbsql_usage();
+function drush_dgb_backup() {
+  drush_dgb_dump();
+  drush_dgb_commit();
+  drush_dgb_usage();
 }
 
 /**
  * Command callback. Displays some usage stats.
  */
-function drush_dgbsql_usage() {
-  $dgb_settings = _dgbsql_get_required_settings();
+function drush_dgb_usage() {
+  $dgb_settings = _dgb_get_required_settings();
 
   drush_print('Space used on the filesystem:');
   drush_print('- Drupal:');
@@ -89,10 +89,10 @@ function drush_dgbsql_usage() {
 /**
  * Command callback. Commit changes to git.
  */
-function drush_dgbsql_commit() {
-  $dgb_settings = _dgbsql_get_required_settings();
+function drush_dgb_commit() {
+  $dgb_settings = _dgb_get_required_settings();
 
-  $message = drush_get_option('dgbsql-commit-message') ? drush_get_option('dgbsql-commit-message') : "auto-commit changes for databases and files by dgb.";
+  $message = drush_get_option('dgb-commit-message') ? drush_get_option('dgb-commit-message') : "auto-commit changes for databases and files by dgb.";
 
   // Add DRUPAL_ROOT to git index.
   $exec  = 'git add .';
@@ -110,8 +110,8 @@ function drush_dgbsql_commit() {
 /**
  * Command callback. Backup the whole Drupal installation.
  */
-function drush_dgbsql_dump() {
-  $dgb_settings = _dgbsql_get_required_settings();
+function drush_dgb_dump() {
+  $dgb_settings = _dgb_get_required_settings();
 
   // Set a default list of structure tables which should work for most sites.
   $default_structure_tables = array(
@@ -140,7 +140,7 @@ function drush_dgbsql_dump() {
 
     // Prepare SQL dump command.
     drush_log('Processing ' . $site->filename);
-    $exec = drush_dgbsql_build_dump_command(_drush_sql_get_spec_from_settings($site->filename . '/settings.php', ''));
+    $exec = drush_dgb_build_dump_command(_drush_sql_get_spec_from_settings($site->filename . '/settings.php', ''));
     if (drush_get_option('display-dump-command')) {
       drush_print('Dump command: ' . $exec . "\n");
     }
@@ -152,7 +152,7 @@ function drush_dgbsql_dump() {
   return;
 }
 
-function drush_dgbsql_build_dump_command($db_spec = NULL) {
+function drush_dgb_build_dump_command($db_spec = NULL) {
   $ignores = array();
 
   if (is_null($db_spec)) {
@@ -161,13 +161,13 @@ function drush_dgbsql_build_dump_command($db_spec = NULL) {
   $database = $db_spec['database'];
 
   // Skip large core tables if instructed.  Also used by 'sql-sync' command.
-  $skip_tables = _drush_dgbsql_get_table_list($db_spec, 'skip-tables');
+  $skip_tables = _drush_dgb_get_table_list($db_spec, 'skip-tables');
   // Skip any structure-tables as well.
-  $structure_tables = _drush_dgbsql_get_table_list($db_spec, 'structure-tables');
+  $structure_tables = _drush_dgb_get_table_list($db_spec, 'structure-tables');
   $skip_tables += $structure_tables;
   // Dump only the specified tables.  Takes precedence over skip-tables and
   // structure-tables.
-  $tables = _drush_dgbsql_get_table_list($db_spec, 'tables');
+  $tables = _drush_dgb_get_table_list($db_spec, 'tables');
   $data_only = drush_get_option('data-only');
   // The ordered-dump option is only supported by MySQL for now.
   $ordered_dump = drush_get_option('ordered-dump');
@@ -257,7 +257,7 @@ function drush_dgbsql_build_dump_command($db_spec = NULL) {
 
 // Given an option name (skip-tables, structure-tables or tables),
 // look up the appropriate list of tables in the given category.
-function _drush_dgbsql_get_table_list($db_spec, $option_name) {
+function _drush_dgb_get_table_list($db_spec, $option_name) {
   $tables = array();
   foreach(array('', 'source-', 'target-') as $prefix) {
     $key_list = drush_get_option($prefix . $option_name . '-key');
@@ -280,7 +280,7 @@ function _drush_dgbsql_get_table_list($db_spec, $option_name) {
   }
 
   // Get the existing table names contained in the current database.
-  $db_tables = _drush_dgbsql_get_db_table_list($db_spec);
+  $db_tables = _drush_dgb_get_db_table_list($db_spec);
   // Table name expansion based on * wildcard.
   $expanded_db_tables = array();
   foreach ($tables as $k => $table) {
@@ -318,7 +318,7 @@ function _drush_dgbsql_get_table_list($db_spec, $option_name) {
  * @return array
  *   A list of table names which exist in the current database.
  */
-function _drush_dgbsql_get_db_table_list($db_spec) {
+function _drush_dgb_get_db_table_list($db_spec) {
   $db_tables = array();
 
   $scheme = _drush_sql_get_scheme($db_spec);
@@ -371,18 +371,18 @@ function _drush_dgbsql_get_db_table_list($db_spec) {
   return $db_tables;
 }
 
-function _dgbsql_get_required_settings() {
+function _dgb_get_required_settings() {
   $dgb_settings = array();
   // Ensure the location for the database dumps is given in the options and
   // exists on the filesystem.
-  if (!$dgb_settings['db_dumps_path'] = drush_get_option('dgbsql-dumps')) {
+  if (!$dgb_settings['db_dumps_path'] = drush_get_option('dgb-dumps')) {
     drush_die('dgb requires to have the location of the database dumps specified either in the command line or in a drushrc.php file. See README.txt and example-dgb.drushrc.php');
   }
   if (!is_dir($dgb_settings['db_dumps_path'])) {
-    drush_die('The path given in the dgbsql-dumps options must exist on your filesystem. You must create it yourself.');
+    drush_die('The path given in the dgb-dumps options must exist on your filesystem. You must create it yourself.');
   }
 
-  if (!$dgb_settings['repository'] = drush_get_option('dgbsql-repository')) {
+  if (!$dgb_settings['repository'] = drush_get_option('dgb-repository')) {
     drush_die('dgb requires the path to the repository in order to do a commit. See README.txt and example-dgb.drushrc.php');
   }
 

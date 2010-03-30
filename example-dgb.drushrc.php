@@ -36,14 +36,14 @@ $dgb_options = array(
   // repository and outside the public web space of your server.
   // Default is to assume the database dumps directory is one level up the
   // drupal installation directory.
-  'dgbsql-dumps' => '../databases',
+  'dgb-dumps' => '../databases',
   // Location of the git repository. Typically one level up DRUPAL_ROOT.
-  'dgbsql-repository' => '..',
+  'dgb-repository' => '..',
 );
-$command_specific['dgbsql-dump'] = $dgb_options;
-$command_specific['dgbsql-commit'] = $dgb_options;
-$command_specific['dgbsql-usage'] = $dgb_options;
-$command_specific['dgbsql-backup'] = $dgb_options;
+$command_specific['dgb-dump'] = $dgb_options;
+$command_specific['dgb-commit'] = $dgb_options;
+$command_specific['dgb-usage'] = $dgb_options;
+$command_specific['dgb-backup'] = $dgb_options;
 
 /*
  * Customize this associative array with your own tables. This is the list of
