@@ -56,3 +56,5 @@ $dgb_options = array(
 );
 $command_specific['dgbsql-dump'] = $dgb_options;
 $command_specific['dgbsql-commit'] = $dgb_options;
+$command_specific['dgbsql-usage'] = $dgb_options;
+$command_specific['dgbsql-backup'] = $dgb_options;
