@@ -20,56 +20,42 @@ function dgbsql_drush_command() {
   $items = array();
 
   $items['dgbsql-dump'] = array(
-    'description' => "Alternative to the core sql-dump command, with support for table name expansion and validation.",
-    'callback' => 'drush_dgbsql_dump',
-    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
-    'examples' => array(
-      'drush sql-dump --result-file=../18.sql' => 'Save SQL dump to the directory above Drupal root.',
-      'drush sql-dump --skip-tables-key=common' => 'Skip standard tables. @see example.drushrc.com',
-    ),
-    'options' => array(
-      '--result-file' => 'Save to a file. The file should be relative to Drupal root. Recommended.',
-      '--dgbsql-log' => 'Display the query used for the dump. Helps to ensure the right tables have been backed up.',
-      '--skip-tables-key' => 'A key in the $skip_tables array. @see example.drushrc.php. Optional.',
-      '--structure-tables-key' => 'A key in the $structure_tables array. @see example.drushrc.php. Optional.',
-      '--tables' => 'An explcit list of tables to dump, in comma delimited format',
-      '--ordered-dump' => 'Use this option to output ordered INSERT statements in the sql-dump.Useful when backups are managed in a Version Control System. Optional.',
-      '--create-db' => 'Wipe existing tables (i.e. --clean). Postgres only.',
-      '--data-only' => 'Omit CREATE TABLE statements. Postgres only.',
-      '--ordered-dump' => 'Order by primary key and add line breaks for efficient diff in revision control. Also, faster rsync. Slows down the dump. Mysql only.',
-    ) + $options,
-  );
-
-  $items['dgbsql-commit'] = array(
-    'description' => 'Commits Drupal installation directory including all sites files directory, as well as the SQL dumps directory is they are located in the same master backup directory (typically one level up DRUPAL_ROOT).',
-    'callback' => 'drush_dgbsql_commit',
-    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
-    'options' => array(
-      '--result-file' => 'Save to a file. The file should be relative to Drupal root. Recommended.',
-      '--dgbsql-log' => 'Display the query used for the dump. Helps to ensure the right tables have been backed up.',
-      '--skip-tables-key' => 'A key in the $skip_tables array. @see example.drushrc.php. Optional.',
-      '--structure-tables-key' => 'A key in the $structure_tables array. @see example.drushrc.php. Optional.',
-      '--tables' => 'An explcit list of tables to dump, in comma delimited format',
-      '--ordered-dump' => 'Use this option to output ordered INSERT statements in the sql-dump.Useful when backups are managed in a Version Control System. Optional.',
-      '--create-db' => 'Wipe existing tables (i.e. --clean). Postgres only.',
-      '--data-only' => 'Omit CREATE TABLE statements. Postgres only.',
-      '--ordered-dump' => 'Order by primary key and add line breaks for efficient diff in revision control. Also, faster rsync. Slows down the dump. Mysql only.',
-    ) + $options,
-  );
-
-  $items['dgbsql-backup'] = array(
-    'description' => "Alternative to the core sql-dump command, with support for table name expansion and validation.",
+    'description' => 'Dumps all the databases of a Drupal installation. Alternative to the core sql-dump command, with support for table name expansion and validation.',
     'callback' => 'drush_dgbsql_dump',
     // We require to be located in a fully functionnal Drupal site for now
     // until we provide support/help for the case where the user is calling
     // dgb outside a Drupal site context.
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
-    'examples' => array(
-      'drush sql-dump --result-file=../18.sql' => 'Save SQL dump to the directory above Drupal root.',
-      'drush sql-dump --skip-tables-key=common' => 'Skip standard tables. @see example.drushrc.com',
-    ),
     'options' => array(
-      '--result-file' => 'Save to a file. The file should be relative to Drupal root. Recommended.',
+      '--display-dump-command' => 'Display the query used for the dump. Helps to ensure the right tables have been backed up.',
+      '--skip-tables-key' => 'A key in the $skip_tables array. @see example.drushrc.php. Optional.',
+      '--structure-tables-key' => 'A key in the $structure_tables array. @see example.drushrc.php. Optional.',
+      '--tables' => 'An explcit list of tables to dump, in comma delimited format',
+      '--ordered-dump' => 'Use this option to output ordered INSERT statements in the sql-dump. Useful when backups are managed in a Version Control System. Optional.',
+    ) + $options,
+  );
+
+  $items['dgbsql-commit'] = array(
+    'description' => 'Commits Drupal installation directory including the files directory of all sites, as well as the SQL dumps directory if they are located in the same master backup directory (typically one level up DRUPAL_ROOT).',
+    'callback' => 'drush_dgbsql_commit',
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
+    'options' => array(
+    ) + $options,
+  );
+
+  $items['dgbsql-usage'] = array(
+    'description' => 'Displays some information on the current size of the repository and the Drupal installation.',
+    'callback' => 'drush_dgbsql_usage',
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
+    'options' => array(
+    ) + $options,
+  );
+
+  $items['dgbsql-backup'] = array(
+    'description' => 'Wrapper command to dump, commit and display the size of the Drupal installation and repository',
+    'callback' => 'drush_dgbsql_backup',
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
+    'options' => array(
     ) + $options,
   );
 
@@ -77,26 +63,41 @@ function dgbsql_drush_command() {
 }
 
 /**
+ * Command callback. Backup a Drupal installation.
+ */
+function drush_dgbsql_backup() {
+  drush_dgbsql_dump();
+  drush_dgbsql_commit();
+  drush_dgbsql_usage();
+}
+
+/**
+ * Command callback. Displays some usage stats.
+ */
+function drush_dgbsql_usage() {
+  $dgb_settings = _dgbsql_get_required_settings();
+
+  drush_print('Space used on the filesystem:');
+  drush_print('- Drupal:');
+  drush_op('system', 'du -hs .');
+  drush_print('- Database dumps:');
+  drush_op('system', 'du -hs ' . $dgb_settings['db_dumps_path']);
+  drush_print('- Repository:');
+  drush_op('system', 'du -hs '. $dgb_settings['repository'] . '/.git');
+}
+
+/**
  * Command callback. Commit changes to git.
  */
 function drush_dgbsql_commit() {
-  if (!$repository = drush_get_option('dgbsql-repository')) {
-    drush_die('dgb requires the path to the repository in order to do a commit. See README.txt and example-dgb.drushrc.php');
-  }
-  $db_dumps_path = drush_get_option('dgbsql-dumps');
-  if (empty($db_dumps_path)) {
-    drush_die('dgb requires to have the location of the database dumps specified either in the command line or in a drushrc.php file. See dgbsql-dumps option in README.txt and example-dgb.drushrc.php');
-  }
-  if (!is_dir($db_dumps_path)) {
-    drush_die('The path given in the dgbsql-dumps options must exist on your filesystem. You must create it yourself.');
-  }
+  $dgb_settings = _dgbsql_get_required_settings();
 
   $message = drush_get_option('dgbsql-commit-message') ? drush_get_option('dgbsql-commit-message') : "auto-commit changes for databases and files by dgb.";
 
   // Add DRUPAL_ROOT to git index.
   $exec  = 'git add .';
   // Add database dumps directory to git index.
-  $exec .= '; git add ' . $db_dumps_path;
+  $exec .= '; git add ' . $dgb_settings['db_dumps_path'];
   // If drushrc.php is located in the upper directory, include it in the commit.
   if (is_file('../drushrc.php')) {
     $exec .= '; git add ../drushrc.php';
@@ -110,15 +111,7 @@ function drush_dgbsql_commit() {
  * Command callback. Backup the whole Drupal installation.
  */
 function drush_dgbsql_dump() {
-  // Ensure the location for the database dumps is given in the options and
-  // exists on the filesystem.
-  $db_dumps_path = drush_get_option('dgbsql-dumps');
-  if (empty($db_dumps_path)) {
-    drush_die('dgb requires to have the location of the database dumps specified either in the command line or in a drushrc.php file. See dgbsql-dumps option in README.txt and example-dgb.drushrc.php');
-  }
-  if (!is_dir($db_dumps_path)) {
-    drush_die('The path given in the dgbsql-dumps options must exist on your filesystem. You must create it yourself.');
-  }
+  $dgb_settings = _dgbsql_get_required_settings();
 
   // Set a default list of structure tables which should work for most sites.
   $default_structure_tables = array(
@@ -143,7 +136,7 @@ function drush_dgbsql_dump() {
     }
 
     // Each database dump is stored in its own file in the dumps directory.
-    drush_set_option('result-file', $db_dumps_path . '/' . $site->basename . '.sql');
+    drush_set_option('result-file', $dgb_settings['db_dumps_path'] . '/' . $site->basename . '.sql');
 
     // Prepare SQL dump command.
     drush_log('Processing ' . $site->filename);
@@ -376,4 +369,22 @@ function _drush_dgbsql_get_db_table_list($db_spec) {
   }
 
   return $db_tables;
+}
+
+function _dgbsql_get_required_settings() {
+  $dgb_settings = array();
+  // Ensure the location for the database dumps is given in the options and
+  // exists on the filesystem.
+  if (!$dgb_settings['db_dumps_path'] = drush_get_option('dgbsql-dumps')) {
+    drush_die('dgb requires to have the location of the database dumps specified either in the command line or in a drushrc.php file. See README.txt and example-dgb.drushrc.php');
+  }
+  if (!is_dir($dgb_settings['db_dumps_path'])) {
+    drush_die('The path given in the dgbsql-dumps options must exist on your filesystem. You must create it yourself.');
+  }
+
+  if (!$dgb_settings['repository'] = drush_get_option('dgbsql-repository')) {
+    drush_die('dgb requires the path to the repository in order to do a commit. See README.txt and example-dgb.drushrc.php');
+  }
+
+  return $dgb_settings;
 }
