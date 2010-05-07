@@ -34,9 +34,9 @@ directory structure dgb was designed for is the following:
    configurations.
 4. create a symbolic link to drushrc.php from inside DRUPAL_ROOT, i.e. run the
    following from inside drupal: ln -s ../drushrc.php drushrc.php
-   (the main drushrc.php is kept outside the drupal directory to avoid losing
-   during a core update, but you can put it direcly in there if you prefer.
-   Drush will require to find drush.php in the DRUPAL_ROOT no matter what).
+   (the main drushrc.php is kept outside the drupal directory to avoid losing it
+   during a core file update, but you can put it direcly in there if you prefer.
+   dgb will require a drushrc.php in DRUPAL_ROOT no matter what).
 5. create the 'databases' folder (or whatever name you specified in drushrc.php)
 6. initialize the git repository in the dgb_instance folder by running git init
 7. from the DRUPAL_ROOT directory, type drush dgb-backup to see if dgb was
@@ -44,7 +44,7 @@ directory structure dgb was designed for is the following:
 8. setup a cron job to run the backup every day or so, e.g. to run dgb every day
    at 11am:
    00 11 * * * cd /var/sites/dgb_instance/drupal; /usr/local/bin/drush dgb-backup
-   (adapt /usr/local/bin/drush to wherever your drush is located on your server).
+   (adapt /usr/local/bin/drush to wherever your drush is located on your server)
 
 
 Commands
@@ -66,9 +66,6 @@ dgb ships with several commands (in order of relevance):
 
 - dgb-backup: Wrapper command to dump, commit and display the size of the Drupal
               installation and repository
-
-Type "drush" to get the list of commands
-Tyep "drush help dgb-backup" for example to get more help on a dgb command.
 
 
 Author
