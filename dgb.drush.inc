@@ -140,7 +140,7 @@ function drush_dgb_dump() {
 
     // Prepare SQL dump command.
     drush_log('Processing ' . $site->filename);
-    $exec = drush_dgb_build_dump_command(_drush_sql_get_spec_from_settings($site->filename . '/settings.php', ''));
+    $exec = drush_dgb_build_dump_command(_dgb_sql_get_spec_from_settings($site->filename . '/settings.php', ''));
     if (drush_get_option('display-dump-command')) {
       drush_print('Dump command: ' . $exec . "\n");
     }
@@ -387,4 +387,30 @@ function _dgb_get_required_settings() {
   }
 
   return $dgb_settings;
+}
+
+// Build a $db_spec from a given settings.php.
+// This function was removed from Drush, see http://drupal.org/node/483502
+// @todo reintroduce such this function as API function in Drush.
+function _dgb_sql_get_spec_from_settings($file, $prefix) {
+  // Reset global databases to whatever is defined in $file
+  global $databases, $db_url;
+  require $file;
+
+  // Translate the custom options for sql-sync into ones usually recognized (i.e. no prefix).
+  if ($database = drush_get_option($prefix . 'database')) {
+    drush_set_option('database', $database);
+  }
+  if ($target = drush_get_option($prefix . 'target')) {
+    drush_set_option('target', $target);
+  }
+  // Backwards-compatible for sql load:  accept 'source_database' in addition to the more standard 'source-database'
+  if ($database = drush_get_option(str_replace('-', '_', $prefix . 'database'))) {
+    drush_set_option('database', $value);
+  }
+  if ($target = drush_get_option(str_replace('-', '_', $prefix . 'target'))) {
+    drush_set_option('target', $target);
+  }
+
+  return _drush_sql_get_db_spec();
 }
