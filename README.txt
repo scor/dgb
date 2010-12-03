@@ -38,7 +38,9 @@ directory structure dgb was designed for is the following:
    during a core file update, but you can put it direcly in there if you prefer.
    dgb will require a drushrc.php in DRUPAL_ROOT no matter what).
 5. create the 'databases' folder (or whatever name you specified in drushrc.php)
-6. initialize the git repository in the dgb_instance folder by running git init
+6. initialize the git repository in the dgb_instance folder by running git init.
+   You might want to create a .gitignore file to ignore certains files, for
+   example .svn if you version your file with svn.
 7. from the DRUPAL_ROOT directory, type drush dgb-backup to see if dgb was
    installed successfully.
 8. setup a cron job to run the backup every day or so, e.g. to run dgb every day
