@@ -108,6 +108,9 @@ function drush_dgb_commit() {
   // Commit command.
   $exec .= '; git commit -am "' . $message . '"';
   drush_op('system', $exec );
+
+  // run git gc for maintenance.
+  drush_op('system', 'git gc' );
 }
 
 /**
