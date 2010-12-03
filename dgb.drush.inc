@@ -75,29 +75,29 @@ function drush_dgb_backup() {
  * Command callback. Displays some usage stats.
  */
 function drush_dgb_usage() {
-  $dgb_settings = _dgb_get_required_settings();
+  _dgb_set_required_settings();
 
   drush_print('Space used on the filesystem:');
   drush_print('- Drupal:');
   drush_op('system', 'du -hs .');
   drush_print('- Database dumps:');
-  drush_op('system', 'du -hs ' . $dgb_settings['db_dumps_path']);
+  drush_op('system', 'du -hs ' . drush_get_option('dgb-dumps'));
   drush_print('- Repository:');
-  drush_op('system', 'du -hs '. $dgb_settings['repository'] . '/.git');
+  drush_op('system', 'du -hs '. drush_get_option('dgb-repository') . '/.git');
 }
 
 /**
  * Command callback. Commit changes to git.
  */
 function drush_dgb_commit() {
-  $dgb_settings = _dgb_get_required_settings();
+  _dgb_set_required_settings();
 
   $message = drush_get_option('dgb-commit-message') ? drush_get_option('dgb-commit-message') : "auto-commit changes for databases and files by dgb.";
 
   // Add DRUPAL_ROOT to git index.
   $exec  = 'git add .';
   // Add database dumps directory to git index.
-  $exec .= '; git add ' . $dgb_settings['db_dumps_path'];
+  $exec .= '; git add ' . drush_get_option('dgb-dumps');
   // If drushrc.php is located in the upper directory, include it in the commit.
   if (is_file('../drushrc.php')) {
     $exec .= '; git add ../drushrc.php';
@@ -111,7 +111,7 @@ function drush_dgb_commit() {
  * Command callback. Backup the whole Drupal installation.
  */
 function drush_dgb_dump() {
-  $dgb_settings = _dgb_get_required_settings();
+  _dgb_set_required_settings();
 
   // Set a default list of structure tables which should work for most sites.
   $default_structure_tables = array(
@@ -136,7 +136,7 @@ function drush_dgb_dump() {
     }
 
     // Each database dump is stored in its own file in the dumps directory.
-    drush_set_option('result-file', $dgb_settings['db_dumps_path'] . '/' . $site->basename . '.sql');
+    drush_set_option('result-file', drush_get_option('dgb-dumps') . '/' . $site->basename . '.sql');
 
     // Prepare SQL dump command.
     drush_log('Processing ' . $site->filename);
@@ -371,22 +371,38 @@ function _drush_dgb_get_db_table_list($db_spec) {
   return $db_tables;
 }
 
-function _dgb_get_required_settings() {
-  $dgb_settings = array();
-  // Ensure the location for the database dumps is given in the options and
-  // exists on the filesystem.
-  if (!$dgb_settings['db_dumps_path'] = drush_get_option('dgb-dumps')) {
-    drush_die('dgb requires to have the location of the database dumps specified either in the command line or in a drushrc.php file. See README.txt and example-dgb.drushrc.php');
-  }
-  if (!is_dir($dgb_settings['db_dumps_path'])) {
-    drush_die('The path given in the dgb-dumps options must exist on your filesystem. You must create it yourself.');
+function dgb_default_options() {
+  return array(
+    'verbose' => FALSE,
+    // Necessary to have a better versionability of the sql dumps.
+    'ordered-dump' => TRUE,
+    // By default 'common' is a list of tables whose data will not be backed up.
+    // See below to change or add other keys can be added to
+    // $options['structure-tables'].
+    'structure-tables-key' => 'common',
+    // Useful to see what tables are effectively being backed up.
+    'display-dump-command' => TRUE,
+    // Path to the directory where the database dumps will be stored. Can be
+    // relative to DRUPAL_ROOT or absolute. Make sure it is within the git
+    // repository and outside the public web space of your server.
+    // Default is to assume the database dumps directory is one level up the
+    // drupal installation directory.
+    'dgb-dumps' => '../databases',
+    // Location of the git repository. Typically one level up DRUPAL_ROOT.
+    'dgb-repository' => '..',
+  );
+}
+
+function _dgb_set_required_settings() {
+  // Sets all the dgb default values.
+  foreach (dgb_default_options() as $name => $default) {
+    drush_set_default($name, $default);
   }
 
-  if (!$dgb_settings['repository'] = drush_get_option('dgb-repository')) {
-    drush_die('dgb requires the path to the repository in order to do a commit. See README.txt and example-dgb.drushrc.php');
+  // Ensure the location for the database dumps exists on the filesystem.
+  if (!is_dir(drush_get_option('dgb-dumps'))) {
+    drush_die('The path to the dgb-dumps is set to ' . drush_get_option('dgb-dumps') . '. This directory must exist on your filesystem, you must create it yourself.');
   }
-
-  return $dgb_settings;
 }
 
 // Build a $db_spec from a given settings.php.
