@@ -40,6 +40,7 @@ function dgb_drush_command() {
     'callback' => 'drush_dgb_commit',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
     'options' => array(
+      '--m' => 'An explicit commit message (useful for manual commits for example).',
     ) + $options,
   );
 
@@ -56,6 +57,7 @@ function dgb_drush_command() {
     'callback' => 'drush_dgb_backup',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
     'options' => array(
+      '--m' => 'An explicit commit message (useful for manual commits for example).',
     ) + $options,
   );
 
@@ -92,7 +94,8 @@ function drush_dgb_usage() {
 function drush_dgb_commit() {
   _dgb_set_required_settings();
 
-  $message = drush_get_option('dgb-commit-message') ? drush_get_option('dgb-commit-message') : "auto-commit changes for databases and files by dgb.";
+  // Allow for custom commit message in case of manual backup.
+  $message = drush_get_option('m', 'auto-commit changes for databases and files by dgb.');
 
   // Add DRUPAL_ROOT to git index.
   $exec  = 'git add .';
