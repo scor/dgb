@@ -52,7 +52,7 @@ $command_specific['dgb-backup'] = $dgb_options;
  * array or add a new element.
  */
 //  $options['structure-tables'] = array(
-//     'common' => array('accesslog', 'cache', 'cache_*', 'history', 'search_dataset', 'search_index', 'search_total', 'sessions', 'watchdog'),
+//    'common' => array('accesslog', 'apachesolr_search_node', 'cache', 'cache_*', 'history', 'search_dataset', 'search_index', 'search_total', 'sessions', 'watchdog'),
 //  );
 
 // Default logging level for php notices.  Defaults to "notice"; set to "warning"
