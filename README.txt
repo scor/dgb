@@ -23,7 +23,7 @@ directory structure dgb was designed for is the following:
                                      --> example2.com
                 --> databases --> example1.com.sql
                               --> example2.com.sql
-                --> drushrc.php (dgb configuration file)
+                --> drushrc.php (dgb configuration file, optional)
                 --> .git (dgb git repository)
 
 1. create the dgb_instance folder somewhere on your server (the name does not
