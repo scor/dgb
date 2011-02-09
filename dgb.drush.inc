@@ -184,7 +184,11 @@ function drush_dgb_build_dump_command($db_spec = NULL) {
       if ($file = drush_get_option('result-file')) {
         $exec .= ' --result-file '. $file;
       }
-      $extra = ' --single-transaction --opt -Q' . _drush_sql_get_credentials($db_spec);
+			// Remove '--database=' as it was causing mysqldump errors.
+			$sql_creds = _drush_sql_get_credentials($db_spec);
+			$sql_creds = str_replace('--database=', '', $sql_creds);
+
+			$extra = ' --single-transaction --opt -Q' . $sql_creds;
       if (isset($data_only)) {
         $extra .= ' --no-create-info';
       }
