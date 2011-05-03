@@ -184,7 +184,8 @@ function drush_dgb_build_dump_command($db_spec = NULL) {
       if ($file = drush_get_option('result-file')) {
         $exec .= ' --result-file '. $file;
       }
-      $extra = ' --single-transaction --opt -Q' . _drush_sql_get_credentials($db_spec);
+      // mysqldump wants 'databasename' instead of 'database=databasename' for no good reason.
+      $extra = ' --single-transaction --opt -Q' . str_replace('--database=', ' ', _drush_sql_get_credentials($db_spec));
       if (isset($data_only)) {
         $extra .= ' --no-create-info';
       }
