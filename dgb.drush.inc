@@ -32,6 +32,7 @@ function dgb_drush_command() {
       '--structure-tables-key' => 'A key in the $structure_tables array. @see example.drushrc.php. Optional.',
       '--tables' => 'An explcit list of tables to dump, in comma delimited format',
       '--ordered-dump' => 'Use this option to output ordered INSERT statements in the sql-dump. Useful when backups are managed in a Version Control System. Optional.',
+      '--dgb-dumps' => 'Relative path to where the dgb dumps should be placed.',
     ) + $options,
   );
 
