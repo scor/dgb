@@ -9,7 +9,7 @@ as a version control friendly SQL file. This command leverages git as a powerful
 This Drush command is still at an experimental state so use with caution. Please
 give any feedback or file bugs at http://github.com/scor/dgb
 
-DGB requires Drush 3 <http://drupal.org/project/drush> and works for any version
+DGB requires Drush <http://drupal.org/project/drush> and works for any version
 of Drupal 5, 6 and 7.
 
 Installation
