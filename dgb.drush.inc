@@ -143,7 +143,8 @@ function drush_dgb_dump() {
     }
 
     // Each database dump is stored in its own file in the dumps directory.
-    drush_set_option('result-file', drush_get_option('dgb-dumps') . '/' . $site->basename . '.sql');
+    $output_file = drush_get_option('dgb-dumps') . '/' . $site->basename . '.sql';
+    drush_set_option('result-file', $output_file);
 
     // Prepare SQL dump command.
     drush_log('Processing ' . $site->filename);
@@ -154,6 +155,31 @@ function drush_dgb_dump() {
 
     // Avoid the php memory of the $output array in drush_shell_exec().
     drush_op('system', $exec);
+
+    // Post processing of dump file.
+    if ($changes = drush_get_option('post-processing-changes')) {
+      $patterns = array();
+      $replacements = array();
+      foreach ($changes as $k => $v) {
+        $patterns[] = $k;
+        $replacements[] = $v;
+      }
+      $dump = file_get_contents("../databases/default.sql");
+      if($dump) {
+        $dump = preg_replace($patterns, $replacements, $dump);
+        // Write output to dump file.
+        $fp = fopen($output_file, "w+");
+        if (!$fp) {
+          return drush_set_error('DRUSH_PERM_ERROR', dt('Drushrc (!filename) could not be written', array('!filename' => $filename)));
+        }
+        else {
+          fwrite($fp, $dump);
+          fclose($fp);
+          drush_log(dt('Drushrc file (!filename) was written successfully', array('!filename' => $filename)));
+        }
+      }
+    }
+
   }
 
   return;

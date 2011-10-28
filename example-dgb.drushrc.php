@@ -7,6 +7,21 @@
 // the settings below to it.
 
 /*
+ * Customize this associative array with your own tables. This is the list of
+ * tables whose *data* is skipped by the 'sql-dump' and 'sql-sync' commands when
+ * a structure-tables-key is provided. You may add new tables to the existing
+ * array or add a new element.
+ */
+//  $options['structure-tables'] = array(
+//    'common' => array('accesslog', 'apachesolr_search_node', 'cache', 'cache_*', 'history', 'search_dataset', 'search_index', 'search_node_links', 'search_total', 'sessions', 'watchdog'),
+//  );
+
+// Default logging level for php notices.  Defaults to "notice"; set to "warning"
+// if doing drush development.  Also make sure that error_reporting is set to E_ALL
+// in your php configuration file.  See 'drush status' for the path to your php.ini file.
+#$options['php-notices'] = 'warning';
+
+/*
  * Command-specific options for dgb.
  *
  * To define options that are only applicable to certain commands,
@@ -40,22 +55,18 @@ $dgb_options = array(
   // Location of the git repository. Typically one level up DRUPAL_ROOT.
   'dgb-repository' => '..',
 );
+
+// Sometimes ignoring tables is not enough to ignore data that
+// should not be backed up. This allows more fine grained control via regular
+// expressions over what's ignored in the dump.
+// This is a list of regular expressions for making changes to the dump.
+// Useful for example to remove specific variables from the variable table.
+//$dgb_options['post-processing-changes'] = array(
+//  "/^INSERT INTO `variable` VALUES \('css_js_query_string','.*$\n/m" => '',
+//  "/^INSERT INTO `variable` VALUES \('features_codecache','.*$\n/m" => '',
+//);
+
 $command_specific['dgb-dump'] = $dgb_options;
 $command_specific['dgb-commit'] = $dgb_options;
 $command_specific['dgb-usage'] = $dgb_options;
 $command_specific['dgb-backup'] = $dgb_options;
-
-/*
- * Customize this associative array with your own tables. This is the list of
- * tables whose *data* is skipped by the 'sql-dump' and 'sql-sync' commands when
- * a structure-tables-key is provided. You may add new tables to the existing
- * array or add a new element.
- */
-//  $options['structure-tables'] = array(
-//    'common' => array('accesslog', 'apachesolr_search_node', 'cache', 'cache_*', 'history', 'search_dataset', 'search_index', 'search_node_links', 'search_total', 'sessions', 'watchdog'),
-//  );
-
-// Default logging level for php notices.  Defaults to "notice"; set to "warning"
-// if doing drush development.  Also make sure that error_reporting is set to E_ALL
-// in your php configuration file.  See 'drush status' for the path to your php.ini file.
-#$options['php-notices'] = 'warning';
