@@ -122,7 +122,7 @@ function drush_dgb_dump() {
 
   // Set a default list of structure tables which should work for most sites.
   $default_structure_tables = array(
-    'common' => array('accesslog', 'apachesolr_search_node', 'cache', 'cache_*', 'history', 'search_dataset', 'search_index', 'search_node_links', 'search_total', 'sessions', 'watchdog'),
+    'common' => array('accesslog', 'apachesolr_search_node', 'cache', 'cache_*', 'flood', 'history', 'search_dataset', 'search_index', 'search_node_links', 'search_total', 'sessions', 'watchdog'),
   );
   drush_set_default('structure-tables', $default_structure_tables);
 
