@@ -41,7 +41,7 @@ function dgb_drush_command() {
     'callback' => 'drush_dgb_commit',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
     'options' => array(
-      '--m' => 'An explicit commit message (useful for manual commits for example).',
+      'm' => 'An explicit commit message (useful for manual commits for example).',
     ) + $options,
   );
 
@@ -58,7 +58,7 @@ function dgb_drush_command() {
     'callback' => 'drush_dgb_backup',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION,
     'options' => array(
-      '--m' => 'An explicit commit message (useful for manual commits for example).',
+      'm' => 'An explicit commit message (useful for manual commits for example).',
     ) + $options,
   );
 
