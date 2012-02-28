@@ -337,7 +337,7 @@ function _drush_dgb_get_table_list($db_spec, $option_name) {
   }
 
   // Merge expanded and validated table names.
-  $tables += $expanded_db_tables;
+  $tables = array_merge($tables, $expanded_db_tables);
 
   // Make sure each table name is unique and sort them.
   $tables = array_unique($tables);
