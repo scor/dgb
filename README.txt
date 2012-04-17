@@ -5,7 +5,7 @@ DGB is a Drush command to easily maintain a full backup a Drupal code base and
 all its sites, keeping Drupal files and sites databases together in sync in the
 same repository. It supports multi site setups and will dump each site database
 as a version control friendly SQL file. This command leverages git as a powerful
-(decentralized) version control system to store all site's data efficiently.
+(decentralized) version control system to store all websites' data efficiently.
 This Drush command is still at an experimental state so use with caution. Please
 give any feedback or file bugs at http://github.com/scor/dgb
 
@@ -23,7 +23,6 @@ directory structure dgb was designed for is the following:
                                      --> example2.com
                 --> databases --> example1.com.sql
                               --> example2.com.sql
-                --> drushrc.php (dgb configuration file, optional)
                 --> .git (dgb git repository)
 
 1. create the dgb_instance folder somewhere on your server (the name does not
@@ -46,14 +45,9 @@ directory structure dgb was designed for is the following:
 
 9. The following steps are optional. They allow to customize the names of the
    directories you want to use etc.
-   copy example-dgb.drushrc.php in the dgb_instance folder, rename it
-   drushrc.php and check its content. Its default settings should works for most
-   configurations.
-10.create a symbolic link to drushrc.php from inside DRUPAL_ROOT, i.e. run the
-   following from inside drupal: ln -s ../drushrc.php drushrc.php
-   (the main drushrc.php is kept outside the drupal directory to avoid losing it
-   during a core file update, but you can put it direcly in there if you prefer.
-   dgb will require a drushrc.php in DRUPAL_ROOT no matter what).
+   copy example-dgb.drushrc.php in each site settings directory (.e.g
+   sites/default/), rename it to drushrc.php and check its content.
+   Its default settings should works for most configurations.
 
 
 Commands
