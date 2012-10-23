@@ -197,7 +197,7 @@ function drush_dgb_build_dump_command($db_spec = NULL) {
   $skip_tables = _drush_dgb_get_table_list($db_spec, 'skip-tables');
   // Skip any structure-tables as well.
   $structure_tables = _drush_dgb_get_table_list($db_spec, 'structure-tables');
-  $skip_tables += $structure_tables;
+  $skip_tables  = array_merge($structure_tables, $skip_tables);
   // Dump only the specified tables.  Takes precedence over skip-tables and
   // structure-tables.
   $tables = _drush_dgb_get_table_list($db_spec, 'tables');
