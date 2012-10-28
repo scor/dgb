@@ -6,20 +6,40 @@
 // as part of whole site. If you already have drushrc.php file, you can just add
 // the settings below to it.
 
-/*
- * Customize this associative array with your own tables. This is the list of
- * tables whose *data* is skipped by the 'sql-dump' and 'sql-sync' commands when
- * a structure-tables-key is provided. You may add new tables to the existing
- * array or add a new element.
+/**
+ * List of tables whose *data* is skipped by the 'sql-dump' and 'sql-sync'
+ * commands when the "--structure-tables-key=common" option is provided.
+ * You may add specific tables to the existing array or add a new element.
+ *
+ * This list is very broad and includes tables from contrib modules which you
+ * may not use, but they will be ignored by dgb.
  */
-//  $options['structure-tables'] = array(
-//    'common' => array('accesslog', 'apachesolr_search_node', 'cache', 'cache_*', 'flood', 'history', 'search_dataset', 'search_index', 'search_node_links', 'search_total', 'sessions', 'watchdog'),
-//  );
-
-// Default logging level for php notices.  Defaults to "notice"; set to "warning"
-// if doing drush development.  Also make sure that error_reporting is set to E_ALL
-// in your php configuration file.  See 'drush status' for the path to your php.ini file.
-#$options['php-notices'] = 'warning';
+  $options['structure-tables'] = array(
+    'common' => array(
+      'accesslog',
+      'apachesolr_index_entities*',
+      'apachesolr_search_node',
+      'cache',
+      'cache_*',
+      'captcha_sessions',
+      'ctools_css_cache',
+      'ctools_object_cache',
+      'flood',
+      'history',
+      'migrate_*',
+      'realname',
+      'search_api_item',
+      'search_dataset',
+      'search_index',
+      'search_node_links',
+      'search_total',
+      'sessions',
+      'sparql_store_*',
+      'views_content_cache',
+      'watchdog',
+      'xmlsitemap',
+    ),
+  );
 
 /*
  * Command-specific options for dgb.
@@ -70,3 +90,8 @@ $command_specific['dgb-dump'] = $dgb_options;
 $command_specific['dgb-commit'] = $dgb_options;
 $command_specific['dgb-usage'] = $dgb_options;
 $command_specific['dgb-backup'] = $dgb_options;
+
+// Default logging level for php notices.  Defaults to "notice"; set to "warning"
+// if doing drush development.  Also make sure that error_reporting is set to E_ALL
+// in your php configuration file.  See 'drush status' for the path to your php.ini file.
+#$options['php-notices'] = 'warning';
