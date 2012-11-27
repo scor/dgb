@@ -133,6 +133,8 @@ function drush_dgb_dump() {
       'ctools_object_cache',
       'flood',
       'history',
+      'masquerade',
+      'mollom',
       'migrate_*',
       'realname',
       'search_api_item',
