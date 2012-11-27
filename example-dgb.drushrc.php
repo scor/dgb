@@ -1,10 +1,25 @@
 <?php
 
-// Custom settings for dgb drush command. Rename it to drushrc.php and place it
-// in the Drupal installation directory DRUPAL_ROOT. Alternatively you can place
-// it one level up and make a symbolic link from DRUPAL_ROOT, it will be backed
-// as part of whole site. If you already have drushrc.php file, you can just add
-// the settings below to it.
+/**
+ * Custom settings for dgb drush command.
+ * Rename this file to drushrc.php and optionally copy it to one of the places
+ * listed below in order of precedence:
+ *
+ * 1.  Drupal site folder (e.g. sites/{default|example.com}/drushrc.php).
+ * 2.  Drupal /drush and sites/all/drush folders.
+ * 3.  In any location, as specified by the --config (-c) option.
+ * 4.  User's .drush folder (i.e. ~/.drush/drushrc.php).
+ * 5.  System wide configuration folder (e.g. /etc/drush/drushrc.php).
+ * 6.  Drush installation folder.
+ *
+ * If you already have drushrc.php file, you can just add
+ * the settings below to it.
+ *
+ * Learn more about how to use drushrc.php in your local drush installation
+ * examples/example.drushrc.php or at
+ * http://drupalcode.org/project/drush.git/blob/refs/heads/7.x-5.x:/examples/example.drushrc.php
+ */
+
 
 /**
  * List of tables whose *data* is skipped by the 'sql-dump' and 'sql-sync'
