@@ -32,6 +32,7 @@
   $options['structure-tables'] = array(
     'common' => array(
       'accesslog',
+      'aggregator_item',
       'apachesolr_index_entities*',
       'apachesolr_search_node',
       'cache',
